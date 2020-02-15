@@ -3,16 +3,16 @@ package provider
 import "testing"
 
 func TestCreation(t *testing.T) {
-	provider := New("test.com")
+	provider := New("https://njal.la")
 	if provider == nil {
 		t.Fail()
 	}
 }
 
 func TestGetURL(t *testing.T) {
-	provider := New("test.com")
-	testURL := provider.getURL("/test")
-	if testURL != "test.com/test" {
+	provider := New("https://njal.la")
+	testURL := provider.getURL("/signin/")
+	if testURL != "https://njal.la/signin/" {
 		t.Fail()
 	}
 }

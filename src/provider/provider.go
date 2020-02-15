@@ -14,13 +14,14 @@ type Providers interface {
 	login()
 }
 
-// New constructor
+// New constructor creates a given domain provider with its base URL
 func New(url string) *Provider {
 	return &Provider{
 		URL: url,
 	}
 }
 
+// getURL returns a given domain provider URL, such as https://njal.la/signin/
 func (p *Provider) getURL(path string) string {
 	return fmt.Sprintf("%s%s", p.URL, path)
 }
