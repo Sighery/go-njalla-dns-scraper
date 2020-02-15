@@ -18,8 +18,9 @@ func TestGetURL(t *testing.T) {
 }
 
 func TestDomainURL(t *testing.T) {
-	provider := New("test.com")
-	if provider.getDomainURL() != "test.com" {
+	provider := New("https://njal.la")
+	testURL := provider.getDomainURL("mydomain.com")
+	if testURL != "https://njal.la/domains/mydomain.com/" {
 		t.Fail()
 	}
 }

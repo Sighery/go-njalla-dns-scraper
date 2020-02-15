@@ -26,6 +26,8 @@ func (p *Provider) getURL(path string) string {
 	return fmt.Sprintf("%s%s", p.URL, path)
 }
 
-func (p *Provider) getDomainURL() string {
-	return p.URL
+// getDomainURL returns the provider URL for a given domain configuration,
+// such as https://njal.la/domains/mydomain.com/
+func (p *Provider) getDomainURL(domain string) string {
+	return fmt.Sprintf("%s%s/", p.getURL("/domains/"), domain)
 }
