@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-type Records []record
+type Records []Record
 
 func (r *Records) UnmarshalJSON(data []byte) error {
 	// This just splits up the JSON array into the raw JSON for each object
@@ -31,7 +31,7 @@ func (r *Records) UnmarshalJSON(data []byte) error {
 		}
 
 		// Unmarshal again into the correct type
-		var actual record
+		var actual Record
 		switch recordType {
 		case "A":
 			actual = &RecordA{}
@@ -81,7 +81,7 @@ func (r Records) String() string {
 	return representation
 }
 
-type record interface{}
+type Record interface{}
 
 // A record type
 type RecordA struct {
