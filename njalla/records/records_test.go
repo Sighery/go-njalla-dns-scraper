@@ -153,7 +153,7 @@ func TestValidJSONWorks(t *testing.T) {
 		},
 		&RecordRedirect{
 			ID: 11, Type: "Redirect", Name: "@",
-			URL: "https://example.com", Priority: 301,
+			URL: "https://example.com", RedirectType: 301,
 		},
 		&RecordDynamic{ID: 12, Type: "Dynamic", Name: "@", TTL: 60},
 		&RecordSSHFP{

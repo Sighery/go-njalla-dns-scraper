@@ -1,8 +1,10 @@
 package provider
 
 import (
-	"fmt"
+	// "fmt"
 	"testing"
+
+	// "github.com/Sighery/go-njalla-dns-scraper/njalla/records"
 )
 
 func TestCreation(t *testing.T) {
@@ -38,9 +40,32 @@ func TestDomainURL(t *testing.T) {
 	}
 }
 
-func TestGetDomains(t *testing.T) {
-	provider, _ := New()
-	provider.Login("email", `password`)
-	domains, _ := provider.GetDomains()
-	fmt.Println(domains)
-}
+// func TestGetDomains(t *testing.T) {
+// 	provider, _ := New()
+// 	provider.Login("email", `password`)
+// 	domains, _ := provider.GetDomains()
+// 	fmt.Println(domains)
+// }
+
+// func TestGetRecords(t *testing.T) {
+// 	provider, _ := New()
+// 	provider.Login("email", `password`)
+// 	records, _ := provider.GetRecords("sighery.com")
+// 	for _, record := range records {
+// 		fmt.Println(record)
+// 	}
+// 	fmt.Println(records)
+// }
+
+// func TestAddRecord(t *testing.T) {
+// 	provider, _ := New()
+// 	provider.Login("email", `password`)
+// 	record := records.RecordTXT{
+// 		Type: "TXT",
+// 		Name: "test",
+// 		Content: "TEST",
+// 		TTL: 10800,
+// 	}
+// 	provider.AddRecord("sighery.com", record)
+// 	fmt.Println("Yes")
+// }

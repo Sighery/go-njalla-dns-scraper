@@ -10,7 +10,6 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/Sighery/go-njalla-dns-scraper/njalla/records"
-	"github.com/google/go-querystring/query"
 )
 
 // Provider struct
@@ -182,10 +181,10 @@ func (p *Provider) AddRecord(domain string, record records.Record) error {
 		return loginErr
 	}
 
-	values, vErr := query.Values(record)
-	if vErr != nil {
-		return vErr
-	}
+	values := record.GetURLValues()
+
+	// Remove ID since for adding is unnecessary
+	values.Del("id")
 
 	values.Set("action", "add")
 	values.Set("csrfmiddlewaretoken", csrftoken)

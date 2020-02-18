@@ -3,10 +3,17 @@ package records
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
+
+	"github.com/Sighery/go-njalla-dns-scraper/njalla/structures"
 )
 
+// Records is an array of different record types that implement the Record
+// interface
 type Records []Record
 
+// UnmarshalJSON customises the default unmarshal behaviour to parse into
+// specific record types
 func (r *Records) UnmarshalJSON(data []byte) error {
 	// This just splits up the JSON array into the raw JSON for each object
 	var raw []json.RawMessage
@@ -81,9 +88,12 @@ func (r Records) String() string {
 	return representation
 }
 
-type Record interface{}
+// Record is a common interface for all the specific record types
+type Record interface {
+	GetURLValues() url.Values
+}
 
-// A record type
+// RecordA represents Njalla's A record
 type RecordA struct {
 	ID      int    `json:"id"`
 	Type    string `json:"type"`
@@ -92,7 +102,32 @@ type RecordA struct {
 	TTL     int    `json:"ttl"`
 }
 
-// AAAA record type
+// GetURLValues converts struct fields back into provider suitable values
+func (r RecordA) GetURLValues() url.Values {
+	values := url.Values{}
+	values.Set("id", fmt.Sprintf("%d", r.ID))
+	values.Set("type", r.Type)
+	values.Set("name", r.Name)
+	values.Set("content", r.Content)
+	values.Set("ttl", fmt.Sprintf("%d", r.TTL))
+	return values
+}
+
+// NewRecordA validates and creates a new RecordA
+func NewRecordA(name string, content string, ttl int) (RecordA, error) {
+	if ttlErr := checkValidTTL(ttl); ttlErr != nil {
+		return RecordA{}, ttlErr
+	}
+
+	return RecordA{
+		Type:    "A",
+		Name:    name,
+		Content: content,
+		TTL:     ttl,
+	}, nil
+}
+
+// RecordAAAA represents Njalla's AAAA record
 type RecordAAAA struct {
 	ID      int    `json:"id"`
 	Type    string `json:"type"`
@@ -101,7 +136,32 @@ type RecordAAAA struct {
 	TTL     int    `json:"ttl"`
 }
 
-// CNAME record type
+// GetURLValues converts struct fields back into provider suitable values
+func (r RecordAAAA) GetURLValues() url.Values {
+	values := url.Values{}
+	values.Set("id", fmt.Sprintf("%d", r.ID))
+	values.Set("type", r.Type)
+	values.Set("name", r.Name)
+	values.Set("content", r.Content)
+	values.Set("ttl", fmt.Sprintf("%d", r.TTL))
+	return values
+}
+
+// NewRecordAAAA validates and creates a new RecordAAAA
+func NewRecordAAAA(name string, content string, ttl int) (RecordAAAA, error) {
+	if ttlErr := checkValidTTL(ttl); ttlErr != nil {
+		return RecordAAAA{}, ttlErr
+	}
+
+	return RecordAAAA{
+		Type:    "AAAA",
+		Name:    name,
+		Content: content,
+		TTL:     ttl,
+	}, nil
+}
+
+// RecordCNAME represents Njalla's CNAME record
 type RecordCNAME struct {
 	ID      int    `json:"id"`
 	Type    string `json:"type"`
@@ -110,7 +170,32 @@ type RecordCNAME struct {
 	TTL     int    `json:"ttl"`
 }
 
-// RecordMX type
+// GetURLValues converts struct fields back into provider suitable values
+func (r RecordCNAME) GetURLValues() url.Values {
+	values := url.Values{}
+	values.Set("id", fmt.Sprintf("%d", r.ID))
+	values.Set("type", r.Type)
+	values.Set("name", r.Name)
+	values.Set("content", r.Content)
+	values.Set("ttl", fmt.Sprintf("%d", r.TTL))
+	return values
+}
+
+// NewRecordCNAME validates and creates a new RecordCNAME
+func NewRecordCNAME(name string, content string, ttl int) (RecordCNAME, error) {
+	if ttlErr := checkValidTTL(ttl); ttlErr != nil {
+		return RecordCNAME{}, ttlErr
+	}
+
+	return RecordCNAME{
+		Type:    "CNAME",
+		Name:    name,
+		Content: content,
+		TTL:     ttl,
+	}, nil
+}
+
+// RecordMX represents Njalla's MX record
 type RecordMX struct {
 	ID       int    `json:"id"`
 	Type     string `json:"type"`
@@ -120,7 +205,38 @@ type RecordMX struct {
 	Priority int    `json:"prio"`
 }
 
-// TXT record type
+// GetURLValues converts struct fields back into provider suitable values
+func (r RecordMX) GetURLValues() url.Values {
+	values := url.Values{}
+	values.Set("id", fmt.Sprintf("%d", r.ID))
+	values.Set("type", r.Type)
+	values.Set("name", r.Name)
+	values.Set("content", r.Content)
+	values.Set("ttl", fmt.Sprintf("%d", r.TTL))
+	values.Set("prio", fmt.Sprintf("%d", r.Priority))
+	return values
+}
+
+// NewRecordMX validates and creates a new RecordMX
+func NewRecordMX(name string, content string, ttl int, priority int) (RecordMX, error) {
+	if ttlErr := checkValidTTL(ttl); ttlErr != nil {
+		return RecordMX{}, ttlErr
+	}
+
+	if priErr := checkValidPriority(priority); priErr != nil {
+		return RecordMX{}, priErr
+	}
+
+	return RecordMX{
+		Type:     "MX",
+		Name:     name,
+		Content:  content,
+		TTL:      ttl,
+		Priority: priority,
+	}, nil
+}
+
+// RecordTXT represents Njalla's TXT record
 type RecordTXT struct {
 	ID      int    `json:"id"`
 	Type    string `json:"type"`
@@ -129,7 +245,32 @@ type RecordTXT struct {
 	TTL     int    `json:"ttl"`
 }
 
-// RecordSRV type
+// GetURLValues converts struct fields back into provider suitable values
+func (r RecordTXT) GetURLValues() url.Values {
+	values := url.Values{}
+	values.Set("id", fmt.Sprintf("%d", r.ID))
+	values.Set("type", r.Type)
+	values.Set("name", r.Name)
+	values.Set("content", r.Content)
+	values.Set("ttl", fmt.Sprintf("%d", r.TTL))
+	return values
+}
+
+// NewRecordTXT validates and creates a new RecordTXT
+func NewRecordTXT(name string, content string, ttl int) (RecordTXT, error) {
+	if ttlErr := checkValidTTL(ttl); ttlErr != nil {
+		return RecordTXT{}, ttlErr
+	}
+
+	return RecordTXT{
+		Type:    "TXT",
+		Name:    name,
+		Content: content,
+		TTL:     ttl,
+	}, nil
+}
+
+// RecordSRV represents Njalla's SRV record
 type RecordSRV struct {
 	ID       int    `json:"id"`
 	Type     string `json:"type"`
@@ -137,11 +278,49 @@ type RecordSRV struct {
 	Content  string `json:"content"`
 	TTL      int    `json:"ttl"`
 	Priority int    `json:"prio"`
-	Weight   int    `json:"weight"`
-	Port     int    `json:"port"`
+	Weight   uint   `json:"weight"`
+	Port     uint   `json:"port"`
 }
 
-// CAA record type
+// GetURLValues converts struct fields back into provider suitable values
+func (r RecordSRV) GetURLValues() url.Values {
+	values := url.Values{}
+	values.Set("id", fmt.Sprintf("%d", r.ID))
+	values.Set("type", r.Type)
+	values.Set("name", r.Name)
+	values.Set("content", r.Content)
+	values.Set("ttl", fmt.Sprintf("%d", r.TTL))
+	values.Set("prio", fmt.Sprintf("%d", r.Priority))
+	values.Set("weight", fmt.Sprintf("%d", r.Weight))
+	values.Set("port", fmt.Sprintf("%d", r.Port))
+	return values
+}
+
+// NewRecordSRV validates and creates a new RecordSRV
+func NewRecordSRV(
+	name string, content string, ttl int, priority int, weight uint,
+	port uint,
+) (RecordSRV, error) {
+	if ttlErr := checkValidTTL(ttl); ttlErr != nil {
+		return RecordSRV{}, ttlErr
+	}
+
+	if priErr := checkValidPriority(priority); priErr != nil {
+		return RecordSRV{}, priErr
+	}
+
+	return RecordSRV{
+		Type:     "SRV",
+		Name:     name,
+		Content:  content,
+		TTL:      ttl,
+		Priority: priority,
+		Weight:   weight,
+		Port:     port,
+	}, nil
+}
+
+// RecordCAA represents Njalla's CAA record
 type RecordCAA struct {
 	ID      int    `json:"id"`
 	Type    string `json:"type"`
@@ -150,7 +329,32 @@ type RecordCAA struct {
 	TTL     int    `json:"ttl"`
 }
 
-// PTR record type
+// GetURLValues converts struct fields back into provider suitable values
+func (r RecordCAA) GetURLValues() url.Values {
+	values := url.Values{}
+	values.Set("id", fmt.Sprintf("%d", r.ID))
+	values.Set("type", r.Type)
+	values.Set("name", r.Name)
+	values.Set("content", r.Content)
+	values.Set("ttl", fmt.Sprintf("%d", r.TTL))
+	return values
+}
+
+// NewRecordCAA validates and creates a new RecordCAA
+func NewRecordCAA(name string, content string, ttl int) (RecordCAA, error) {
+	if ttlErr := checkValidTTL(ttl); ttlErr != nil {
+		return RecordCAA{}, ttlErr
+	}
+
+	return RecordCAA{
+		Type:    "CAA",
+		Name:    name,
+		Content: content,
+		TTL:     ttl,
+	}, nil
+}
+
+// RecordPTR represents Njalla's PTR record
 type RecordPTR struct {
 	ID      int    `json:"id"`
 	Type    string `json:"type"`
@@ -159,7 +363,32 @@ type RecordPTR struct {
 	TTL     int    `json:"ttl"`
 }
 
-// NS record type
+// GetURLValues converts struct fields back into provider suitable values
+func (r RecordPTR) GetURLValues() url.Values {
+	values := url.Values{}
+	values.Set("id", fmt.Sprintf("%d", r.ID))
+	values.Set("type", r.Type)
+	values.Set("name", r.Name)
+	values.Set("content", r.Content)
+	values.Set("ttl", fmt.Sprintf("%d", r.TTL))
+	return values
+}
+
+// NewRecordPTR validates and creates a new RecordPTR
+func NewRecordPTR(name string, content string, ttl int) (RecordPTR, error) {
+	if ttlErr := checkValidTTL(ttl); ttlErr != nil {
+		return RecordPTR{}, ttlErr
+	}
+
+	return RecordPTR{
+		Type:    "PTR",
+		Name:    name,
+		Content: content,
+		TTL:     ttl,
+	}, nil
+}
+
+// RecordNS represents Njalla's NS record
 type RecordNS struct {
 	ID      int    `json:"id"`
 	Type    string `json:"type"`
@@ -168,7 +397,32 @@ type RecordNS struct {
 	TTL     int    `json:"ttl"`
 }
 
-// TLSA record type
+// GetURLValues converts struct fields back into provider suitable values
+func (r RecordNS) GetURLValues() url.Values {
+	values := url.Values{}
+	values.Set("id", fmt.Sprintf("%d", r.ID))
+	values.Set("type", r.Type)
+	values.Set("name", r.Name)
+	values.Set("content", r.Content)
+	values.Set("ttl", fmt.Sprintf("%d", r.TTL))
+	return values
+}
+
+// NewRecordNS validates and creates a new RecordNS
+func NewRecordNS(name string, content string, ttl int) (RecordNS, error) {
+	if ttlErr := checkValidTTL(ttl); ttlErr != nil {
+		return RecordNS{}, ttlErr
+	}
+
+	return RecordNS{
+		Type:    "NS",
+		Name:    name,
+		Content: content,
+		TTL:     ttl,
+	}, nil
+}
+
+// RecordTLSA represents Njalla's TLSA record
 type RecordTLSA struct {
 	ID      int    `json:"id"`
 	Type    string `json:"type"`
@@ -177,16 +431,66 @@ type RecordTLSA struct {
 	TTL     int    `json:"ttl"`
 }
 
-// Redirect record type
-type RecordRedirect struct {
-	ID       int    `json:"id"`
-	Type     string `json:"type"`
-	Name     string `json:"name"`
-	URL      string `json:"content"`
-	Priority int    `json:"prio"`
+// GetURLValues converts struct fields back into provider suitable values
+func (r RecordTLSA) GetURLValues() url.Values {
+	values := url.Values{}
+	values.Set("id", fmt.Sprintf("%d", r.ID))
+	values.Set("type", r.Type)
+	values.Set("name", r.Name)
+	values.Set("content", r.Content)
+	values.Set("ttl", fmt.Sprintf("%d", r.TTL))
+	return values
 }
 
-// Dynamic record type
+// NewRecordTLSA validates and creates a new RecordTLSA
+func NewRecordTLSA(name string, content string, ttl int) (RecordTLSA, error) {
+	if ttlErr := checkValidTTL(ttl); ttlErr != nil {
+		return RecordTLSA{}, ttlErr
+	}
+
+	return RecordTLSA{
+		Type:    "TLSA",
+		Name:    name,
+		Content: content,
+		TTL:     ttl,
+	}, nil
+}
+
+// RecordRedirect represents Njalla's Redirect record
+type RecordRedirect struct {
+	ID           int    `json:"id"`
+	Type         string `json:"type"`
+	Name         string `json:"name"`
+	URL          string `json:"content"`
+	RedirectType int    `json:"prio"`
+}
+
+// GetURLValues converts struct fields back into provider suitable values
+func (r RecordRedirect) GetURLValues() url.Values {
+	values := url.Values{}
+	values.Set("id", fmt.Sprintf("%d", r.ID))
+	values.Set("type", r.Type)
+	values.Set("name", r.Name)
+	values.Set("content", r.URL)
+	values.Set("prio", fmt.Sprintf("%d", r.RedirectType))
+	return values
+}
+
+// NewRecordRedirect validates and creates a new RecordRedirect
+func NewRecordRedirect(name string, url string, redirectType int) (RecordRedirect, error) {
+	if rtypeErr := checkValidPriority(redirectType); rtypeErr != nil {
+		return RecordRedirect{}, rtypeErr
+	}
+
+	return RecordRedirect{
+		Type:         "Redirect",
+		Name:         name,
+		URL:          url,
+		RedirectType: redirectType,
+	}, nil
+}
+
+// RecordDynamic represents Njalla's Dynamic record
 type RecordDynamic struct {
 	ID   int    `json:"id"`
 	Type string `json:"type"`
@@ -194,7 +498,30 @@ type RecordDynamic struct {
 	TTL  int    `json:"ttl"`
 }
 
-// SSHFP record type
+// GetURLValues converts struct fields back into provider suitable values
+func (r RecordDynamic) GetURLValues() url.Values {
+	values := url.Values{}
+	values.Set("id", fmt.Sprintf("%d", r.ID))
+	values.Set("type", r.Type)
+	values.Set("name", r.Name)
+	values.Set("ttl", fmt.Sprintf("%d", r.TTL))
+	return values
+}
+
+// NewRecordDynamic validates and creates a new RecordDynamic
+func NewRecordDynamic(name string, content string, ttl int) (RecordDynamic, error) {
+	if ttlErr := checkValidTTL(ttl); ttlErr != nil {
+		return RecordDynamic{}, ttlErr
+	}
+
+	return RecordDynamic{
+		Type: "Dynamic",
+		Name: name,
+		TTL:  ttl,
+	}, nil
+}
+
+// RecordSSHFP represents Njalla's SSHFP record
 type RecordSSHFP struct {
 	ID           int    `json:"id"`
 	Type         string `json:"type"`
@@ -203,4 +530,121 @@ type RecordSSHFP struct {
 	SSHAlgorithm int    `json:"ssh_algorithm"`
 	SSHType      int    `json:"ssh_type"`
 	Content      string `json:"content"`
+}
+
+// NewRecordSSHFP validates and creates a new RecordSSHFP
+func NewRecordSSHFP(
+	name string, content string, ttl int, sshAlgorithm int, sshType int,
+) (RecordSSHFP, error) {
+	if ttlErr := checkValidTTL(ttl); ttlErr != nil {
+		return RecordSSHFP{}, ttlErr
+	}
+
+	if sshAlgErr := checkValidSSHAlgorithm(sshAlgorithm); sshAlgErr != nil {
+		return RecordSSHFP{}, sshAlgErr
+	}
+
+	if sshTypeErr := checkValidSSHType(sshType); sshTypeErr != nil {
+		return RecordSSHFP{}, sshTypeErr
+	}
+
+	return RecordSSHFP{
+		Type:         "SSHFP",
+		Name:         name,
+		TTL:          ttl,
+		SSHAlgorithm: sshAlgorithm,
+		SSHType:      sshType,
+		Content:      content,
+	}, nil
+}
+
+// GetURLValues converts struct fields back into provider suitable values
+func (r RecordSSHFP) GetURLValues() url.Values {
+	values := url.Values{}
+	values.Set("id", fmt.Sprintf("%d", r.ID))
+	values.Set("type", r.Type)
+	values.Set("name", r.Name)
+	values.Set("content", r.Content)
+	values.Set("ttl", fmt.Sprintf("%d", r.TTL))
+	values.Set("ssh_algorithm", fmt.Sprintf("%d", r.SSHAlgorithm))
+	values.Set("ssh_type", fmt.Sprintf("%d", r.SSHType))
+	return values
+}
+
+func checkValidTTL(ttl int) error {
+	valid := []int{
+		structures.TTL60, structures.TTL300, structures.TTL900,
+		structures.TTL10800, structures.TTL21600, structures.TTL86400,
+	}
+
+	for _, value := range valid {
+		if ttl == value {
+			return nil
+		}
+	}
+
+	return fmt.Errorf("Given TTL [%d] is not valid: %+v", ttl, valid)
+}
+
+func checkValidPriority(priority int) error {
+	valid := []int{
+		structures.PRIORITY0, structures.PRIORITY1, structures.PRIORITY5,
+		structures.PRIORITY10, structures.PRIORITY20, structures.PRIORITY30,
+		structures.PRIORITY40, structures.PRIORITY50, structures.PRIORITY60,
+	}
+
+	for _, value := range valid {
+		if priority == value {
+			return nil
+		}
+	}
+
+	return fmt.Errorf(
+		"Given Priority [%d] is not valid: %+v", priority, valid,
+	)
+}
+
+func checkValidRedirectType(redirectType int) error {
+	valid := []int{structures.REDIRECTTYPE301, structures.REDIRECTTYPE302}
+
+	for _, value := range valid {
+		if redirectType == value {
+			return nil
+		}
+	}
+
+	return fmt.Errorf(
+		"Given Redirect Type [%d] is not valid: %+v", redirectType, valid,
+	)
+}
+
+func checkValidSSHAlgorithm(sshAlgorithm int) error {
+	valid := []int{
+		structures.SSHALGORITHMRSA, structures.SSHALGORITHMDSA,
+		structures.SSHALGORITHMECDSA, structures.SSHALGORITHMED25519,
+	}
+
+	for _, value := range valid {
+		if sshAlgorithm == value {
+			return nil
+		}
+	}
+
+	return fmt.Errorf(
+		"Given SSH Algorithm [%d] is not valid: %+v", sshAlgorithm, valid,
+	)
+}
+
+func checkValidSSHType(sshType int) error {
+	valid := []int{structures.SSHTYPESSHA1, structures.SSHTYPESSHA256}
+
+	for _, value := range valid {
+		if sshType == value {
+			return nil
+		}
+	}
+
+	return fmt.Errorf(
+		"Given SSH Type [%d] is not valid: %+v", sshType, valid,
+	)
 }
