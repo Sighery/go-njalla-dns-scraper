@@ -17,7 +17,6 @@ type Provider struct {
 	BaseURL string
 	jar     *cookiejar.Jar
 	client  http.Client
-	Records records.Records
 }
 
 // New constructor creates a given domain provider with its base URL
@@ -31,7 +30,6 @@ func New() (*Provider, error) {
 		BaseURL: "https://njal.la",
 		jar:     jar,
 		client:  http.Client{Jar: jar},
-		Records: records.Records{},
 	}, nil
 }
 
