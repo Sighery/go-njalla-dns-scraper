@@ -59,6 +59,15 @@ func TestDomainURL(t *testing.T) {
 // 	}
 // }
 
+// func TestRemoveDomain(t *testing.T) {
+// 	provider, _ := New()
+// 	provider.Login("email", `password`)
+// 	err := provider.RemoveRecord("sighery.com", 118760)
+// 	if err != nil {
+// 		t.Error(err)
+// 	}
+// }
+
 // func TestGetDomains(t *testing.T) {
 // 	provider, _ := New()
 // 	provider.Login("email", `password`)

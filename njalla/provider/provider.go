@@ -280,6 +280,74 @@ func (p *Provider) UpdateRecord(
 	return nil
 }
 
+// RemoveRecord takes a given Record ID and tries to remove it from Njalla.
+// Because of how Njalla's website works, a "remove" operation is really just
+// an update operation. An update operation that keeps all the records but the
+// one you want to remove.
+func (p *Provider) RemoveRecord(domain string, recordID int) error {
+	csrftoken, err := getCSRFToken(p.jar, p.BaseURL)
+	if err != nil {
+		return err
+	}
+
+	storedRecords, recErr := p.GetRecords(domain)
+	if recErr != nil {
+		return recErr
+	}
+
+	updateMap := make(map[string]map[string]string)
+	for _, storedRecord := range storedRecords {
+		key := fmt.Sprintf("%d", storedRecord.GetID())
+		content := storedRecord.GetURLValues()
+
+		if storedRecord.GetID() == recordID {
+			continue
+		}
+
+		// On update the ID is used to create a new map under that ID
+		// And Type is not included in that inner map
+		content.Del("id")
+		content.Del("type")
+
+		m := make(map[string]string)
+		for k, v := range content {
+			m[k] = v[0]
+		}
+
+		updateMap[key] = m
+	}
+
+	var jsonRecords string
+	if len(updateMap) == 0 {
+		jsonRecords = "{}"
+	} else {
+		jsonRecordsTmp, jsonErr := json.Marshal(updateMap)
+		if jsonErr != nil {
+			return jsonErr
+		}
+		jsonRecords = string(jsonRecordsTmp)
+	}
+
+	values := url.Values{}
+	values.Set("records", jsonRecords)
+	values.Set("action", "update")
+	values.Set("csrfmiddlewaretoken", csrftoken)
+
+	resp, respErr := postForm(p.client, p.getDomainURL(domain), values)
+	if respErr != nil {
+		return respErr
+	}
+
+	if resp.StatusCode != 200 {
+		return fmt.Errorf(
+			"Removing record %d failed with status code %d",
+			recordID, resp.StatusCode,
+		)
+	}
+
+	return nil
+}
+
 func postForm(
 	client http.Client, path string, data url.Values,
 ) (*http.Response, error) {
