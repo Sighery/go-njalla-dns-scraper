@@ -58,24 +58,13 @@ as well.
 
 ## Issues and Missing Features
 
-Currently this is more of a script than anything else. It's not a library, and
-the email and password values must be written directly into the code. There's
-plenty of code duplication, and I'm sure it's inefficient and full of "code
-smells" for anyone who knows Go.
+I've already achieved parity with the NodeJS version. It's currently somewhat
+of a library as well. The current code is not pretty. It makes use of quite a
+few hacks because I don't know Go, and I don't know how to do some dynamic
+changes I need in a static way that Go will like.
 
-**Now, for limitations of the current code:**
-* You can't update records
-* You can't remove records
-* Fetching records will fail if record types other than A, AAAA, MX, or TXT
-  are available. This is because other record types have a different data
-  structure, but currently the code is targeting the ones mentioned, so it
-  will fail with record types that have different columns
-* You can only add A, AAAA, MX, and TXT records
-
-This will be slowly solved, as I figure out how write proper Go, how to make
-this into a library that can then be used by other Go programs, how to
-structure my code in Go, and then add the rest of the missing functionality
-that the NodeJS package currently has.
+Currently there's also no CLI client. Although I plan on adding, or trying to,
+add one soon enough.
 
 [0]: https://njal.la/
 [1]: https://letsencrypt.org/
