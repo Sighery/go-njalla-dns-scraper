@@ -91,6 +91,7 @@ func (r Records) String() string {
 // Record is a common interface for all the specific record types
 type Record interface {
 	GetURLValues() url.Values
+	GetID() int
 }
 
 // RecordA represents Njalla's A record
@@ -111,6 +112,11 @@ func (r RecordA) GetURLValues() url.Values {
 	values.Set("content", r.Content)
 	values.Set("ttl", fmt.Sprintf("%d", r.TTL))
 	return values
+}
+
+// GetID exposes the internal ID
+func (r RecordA) GetID() int {
+	return r.ID
 }
 
 // NewRecordA validates and creates a new RecordA
@@ -147,6 +153,11 @@ func (r RecordAAAA) GetURLValues() url.Values {
 	return values
 }
 
+// GetID exposes the internal ID
+func (r RecordAAAA) GetID() int {
+	return r.ID
+}
+
 // NewRecordAAAA validates and creates a new RecordAAAA
 func NewRecordAAAA(name string, content string, ttl int) (RecordAAAA, error) {
 	if ttlErr := checkValidTTL(ttl); ttlErr != nil {
@@ -179,6 +190,11 @@ func (r RecordCNAME) GetURLValues() url.Values {
 	values.Set("content", r.Content)
 	values.Set("ttl", fmt.Sprintf("%d", r.TTL))
 	return values
+}
+
+// GetID exposes the internal ID
+func (r RecordCNAME) GetID() int {
+	return r.ID
 }
 
 // NewRecordCNAME validates and creates a new RecordCNAME
@@ -215,6 +231,11 @@ func (r RecordMX) GetURLValues() url.Values {
 	values.Set("ttl", fmt.Sprintf("%d", r.TTL))
 	values.Set("prio", fmt.Sprintf("%d", r.Priority))
 	return values
+}
+
+// GetID exposes the internal ID
+func (r RecordMX) GetID() int {
+	return r.ID
 }
 
 // NewRecordMX validates and creates a new RecordMX
@@ -256,6 +277,11 @@ func (r RecordTXT) GetURLValues() url.Values {
 	return values
 }
 
+// GetID exposes the internal ID
+func (r RecordTXT) GetID() int {
+	return r.ID
+}
+
 // NewRecordTXT validates and creates a new RecordTXT
 func NewRecordTXT(name string, content string, ttl int) (RecordTXT, error) {
 	if ttlErr := checkValidTTL(ttl); ttlErr != nil {
@@ -294,6 +320,11 @@ func (r RecordSRV) GetURLValues() url.Values {
 	values.Set("weight", fmt.Sprintf("%d", r.Weight))
 	values.Set("port", fmt.Sprintf("%d", r.Port))
 	return values
+}
+
+// GetID exposes the internal ID
+func (r RecordSRV) GetID() int {
+	return r.ID
 }
 
 // NewRecordSRV validates and creates a new RecordSRV
@@ -340,6 +371,11 @@ func (r RecordCAA) GetURLValues() url.Values {
 	return values
 }
 
+// GetID exposes the internal ID
+func (r RecordCAA) GetID() int {
+	return r.ID
+}
+
 // NewRecordCAA validates and creates a new RecordCAA
 func NewRecordCAA(name string, content string, ttl int) (RecordCAA, error) {
 	if ttlErr := checkValidTTL(ttl); ttlErr != nil {
@@ -372,6 +408,11 @@ func (r RecordPTR) GetURLValues() url.Values {
 	values.Set("content", r.Content)
 	values.Set("ttl", fmt.Sprintf("%d", r.TTL))
 	return values
+}
+
+// GetID exposes the internal ID
+func (r RecordPTR) GetID() int {
+	return r.ID
 }
 
 // NewRecordPTR validates and creates a new RecordPTR
@@ -408,6 +449,11 @@ func (r RecordNS) GetURLValues() url.Values {
 	return values
 }
 
+// GetID exposes the internal ID
+func (r RecordNS) GetID() int {
+	return r.ID
+}
+
 // NewRecordNS validates and creates a new RecordNS
 func NewRecordNS(name string, content string, ttl int) (RecordNS, error) {
 	if ttlErr := checkValidTTL(ttl); ttlErr != nil {
@@ -440,6 +486,11 @@ func (r RecordTLSA) GetURLValues() url.Values {
 	values.Set("content", r.Content)
 	values.Set("ttl", fmt.Sprintf("%d", r.TTL))
 	return values
+}
+
+// GetID exposes the internal ID
+func (r RecordTLSA) GetID() int {
+	return r.ID
 }
 
 // NewRecordTLSA validates and creates a new RecordTLSA
@@ -476,6 +527,11 @@ func (r RecordRedirect) GetURLValues() url.Values {
 	return values
 }
 
+// GetID exposes the internal ID
+func (r RecordRedirect) GetID() int {
+	return r.ID
+}
+
 // NewRecordRedirect validates and creates a new RecordRedirect
 func NewRecordRedirect(name string, url string, redirectType int) (RecordRedirect, error) {
 	if rtypeErr := checkValidPriority(redirectType); rtypeErr != nil {
@@ -508,6 +564,11 @@ func (r RecordDynamic) GetURLValues() url.Values {
 	return values
 }
 
+// GetID exposes the internal ID
+func (r RecordDynamic) GetID() int {
+	return r.ID
+}
+
 // NewRecordDynamic validates and creates a new RecordDynamic
 func NewRecordDynamic(name string, content string, ttl int) (RecordDynamic, error) {
 	if ttlErr := checkValidTTL(ttl); ttlErr != nil {
@@ -530,6 +591,24 @@ type RecordSSHFP struct {
 	SSHAlgorithm int    `json:"ssh_algorithm"`
 	SSHType      int    `json:"ssh_type"`
 	Content      string `json:"content"`
+}
+
+// GetURLValues converts struct fields back into provider suitable values
+func (r RecordSSHFP) GetURLValues() url.Values {
+	values := url.Values{}
+	values.Set("id", fmt.Sprintf("%d", r.ID))
+	values.Set("type", r.Type)
+	values.Set("name", r.Name)
+	values.Set("content", r.Content)
+	values.Set("ttl", fmt.Sprintf("%d", r.TTL))
+	values.Set("ssh_algorithm", fmt.Sprintf("%d", r.SSHAlgorithm))
+	values.Set("ssh_type", fmt.Sprintf("%d", r.SSHType))
+	return values
+}
+
+// GetID exposes the internal ID
+func (r RecordSSHFP) GetID() int {
+	return r.ID
 }
 
 // NewRecordSSHFP validates and creates a new RecordSSHFP
@@ -556,19 +635,6 @@ func NewRecordSSHFP(
 		SSHType:      sshType,
 		Content:      content,
 	}, nil
-}
-
-// GetURLValues converts struct fields back into provider suitable values
-func (r RecordSSHFP) GetURLValues() url.Values {
-	values := url.Values{}
-	values.Set("id", fmt.Sprintf("%d", r.ID))
-	values.Set("type", r.Type)
-	values.Set("name", r.Name)
-	values.Set("content", r.Content)
-	values.Set("ttl", fmt.Sprintf("%d", r.TTL))
-	values.Set("ssh_algorithm", fmt.Sprintf("%d", r.SSHAlgorithm))
-	values.Set("ssh_type", fmt.Sprintf("%d", r.SSHType))
-	return values
 }
 
 func checkValidTTL(ttl int) error {
