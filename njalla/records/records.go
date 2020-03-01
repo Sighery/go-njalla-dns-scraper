@@ -83,7 +83,8 @@ func (r *Records) UnmarshalJSON(data []byte) error {
 func (r Records) String() string {
 	representation := ""
 	for _, record := range r {
-		representation += fmt.Sprintf("%+v", record)
+		s, _ := json.Marshal(record)
+		representation += fmt.Sprintf("%s\n", s)
 	}
 	return representation
 }
