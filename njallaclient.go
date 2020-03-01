@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -46,6 +47,26 @@ func listRecords(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+func removeRecord(cmd *cobra.Command, args []string) error {
+	domain := args[0]
+	recordID, err := strconv.Atoi(args[1])
+	if err != nil {
+		return fmt.Errorf("RecordID is not a valid int value: %s", args[1])
+	}
+
+	njalla, err := loginCLI()
+	if err != nil {
+		return err
+	}
+
+	err = njalla.RemoveRecord(domain, recordID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func main() {
 	cmdDomains := &cobra.Command{
 		Use:   "domains",
@@ -61,6 +82,16 @@ func main() {
 		RunE:  listRecords,
 	}
 
+	cmdRemove := &cobra.Command{
+		Use:   "remove [domain] [recordID]",
+		Short: "Remove a given record with its ID from a domain",
+		Long: `Takes a domain and a record ID to remove.
+You can get a record ID from the records command. This record ID should be
+an integer number or else this command will fail.`,
+		Args: cobra.ExactArgs(2),
+		RunE: removeRecord,
+	}
+
 	rootCmd := &cobra.Command{
 		Use:   "njallaclient",
 		Short: "Njalla DNS Records client",
@@ -73,6 +104,7 @@ adds, updates, or removes any one record from a domain.`,
 	}
 	rootCmd.AddCommand(cmdDomains)
 	rootCmd.AddCommand(cmdRecords)
+	rootCmd.AddCommand(cmdRemove)
 	rootCmd.Execute()
 }
 
