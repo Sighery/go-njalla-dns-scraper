@@ -28,12 +28,37 @@ func listDomains(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+func listRecords(cmd *cobra.Command, args []string) error {
+	domain := args[0]
+
+	njalla, err := loginCLI()
+	if err != nil {
+		return err
+	}
+
+	records, err := njalla.GetRecords(domain)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(records)
+
+	return nil
+}
+
 func main() {
 	cmdDomains := &cobra.Command{
 		Use:   "domains",
 		Short: "List all available domains",
 		Args:  cobra.NoArgs,
 		RunE:  listDomains,
+	}
+
+	cmdRecords := &cobra.Command{
+		Use:   "records [domain]",
+		Short: "List all available records for a domain",
+		Args:  cobra.ExactArgs(1),
+		RunE:  listRecords,
 	}
 
 	rootCmd := &cobra.Command{
@@ -47,6 +72,7 @@ This CLI allows you to list available domains, list records for a domain,
 adds, updates, or removes any one record from a domain.`,
 	}
 	rootCmd.AddCommand(cmdDomains)
+	rootCmd.AddCommand(cmdRecords)
 	rootCmd.Execute()
 }
 
