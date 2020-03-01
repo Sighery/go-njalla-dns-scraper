@@ -36,7 +36,16 @@ func main() {
 		RunE:  listDomains,
 	}
 
-	rootCmd := &cobra.Command{Use: "njallaclient"}
+	rootCmd := &cobra.Command{
+		Use:   "njallaclient",
+		Short: "Njalla DNS Records client",
+		Long: `A client to manage Njalla's DNS Records programmatically.
+
+Since Njalla doesn't offer an API, this makes use of the go-njalla-dns-scrapper
+library to parse and interact with Njalla's website.
+This CLI allows you to list available domains, list records for a domain,
+adds, updates, or removes any one record from a domain.`,
+	}
 	rootCmd.AddCommand(cmdDomains)
 	rootCmd.Execute()
 }
