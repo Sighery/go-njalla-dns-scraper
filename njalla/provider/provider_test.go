@@ -40,6 +40,25 @@ func TestDomainURL(t *testing.T) {
 	}
 }
 
+// func TestUpdateDomain(t *testing.T) {
+// 	provider, _ := New()
+// 	provider.Login("email", `password`)
+// 	records, _ := provider.GetRecords("sighery.com")
+// 	for _, r := range records {
+// 		if r.GetID() == 118747 {
+// 			toChange := r.GetURLValues()
+// 			toChange.Set("content", "TEST3")
+// 			err := provider.UpdateRecord(
+// 				"sighery.com", r.GetID(), toChange,
+// 			)
+// 			if err != nil {
+// 				t.Error(err)
+// 				return
+// 			}
+// 		}
+// 	}
+// }
+
 // func TestGetDomains(t *testing.T) {
 // 	provider, _ := New()
 // 	provider.Login("email", `password`)

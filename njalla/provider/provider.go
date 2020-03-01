@@ -201,7 +201,88 @@ func (p *Provider) AddRecord(domain string, record records.Record) error {
 	return nil
 }
 
-func postForm(client http.Client, path string, data url.Values) (*http.Response, error) {
+// UpdateRecord takes a given Record ID, and a Record with its fields changed
+// as a url.Values struct.
+// Because of limitations with the website itself, we can't just one or more
+// fields and send that change. We also can't just modify one record and send
+// that only record.
+// An update operation requires updating the fields you want from the record
+// you want to update, but also keep all the fields you haven't modified.
+// Also keep the rest of the records unmodified.
+// But then you have to remove the `type` field of every record.
+// Also convert all the fields into string.
+// Then remove the `id` field and convert it into:
+// {"id": { ...rest of fields... }, }
+// So you end with a JSON that contains ID keys, and the values are the
+// records with the `type` and `id` fields removed, and the remaining fields'
+// values converted to string.
+//
+// Take a Record you want to modify from GetRecords, call GetURLValues() on
+// it, modify whatever you need, and then pass those url.Values to this
+// function
+func (p *Provider) UpdateRecord(
+	domain string, recordID int, record url.Values,
+) error {
+	csrftoken, err := getCSRFToken(p.jar, p.BaseURL)
+	if err != nil {
+		return err
+	}
+
+	storedRecords, recErr := p.GetRecords(domain)
+	if recErr != nil {
+		return recErr
+	}
+
+	updateMap := make(map[string]map[string]string)
+	for _, storedRecord := range storedRecords {
+		key := fmt.Sprintf("%d", storedRecord.GetID())
+		content := storedRecord.GetURLValues()
+
+		if storedRecord.GetID() == recordID {
+			content = record
+		}
+
+		// On update the ID is used to create a new map under that ID
+		// And Type is not included in that inner map
+		content.Del("id")
+		content.Del("type")
+
+		m := make(map[string]string)
+		for k, v := range content {
+			m[k] = v[0]
+		}
+
+		updateMap[key] = m
+	}
+
+	jsonRecords, jsonErr := json.Marshal(updateMap)
+	if jsonErr != nil {
+		return jsonErr
+	}
+
+	values := url.Values{}
+	values.Set("action", "update")
+	values.Set("csrfmiddlewaretoken", csrftoken)
+	values.Set("records", string(jsonRecords))
+
+	resp, respErr := postForm(p.client, p.getDomainURL(domain), values)
+	if respErr != nil {
+		return respErr
+	}
+
+	if resp.StatusCode != 200 {
+		return fmt.Errorf(
+			"Updating record %+v failed with status code %d",
+			record, resp.StatusCode,
+		)
+	}
+
+	return nil
+}
+
+func postForm(
+	client http.Client, path string, data url.Values,
+) (*http.Response, error) {
 	req, err := http.NewRequest("POST", path, strings.NewReader(data.Encode()))
 	if err != nil {
 		return nil, err
