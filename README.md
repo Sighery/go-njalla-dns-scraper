@@ -1,3 +1,12 @@
+# Deprecated: https://github.com/Sighery/gonjalla
+
+Njalla has since released an official API which renders this code obsolete
+and overly complex. Head over to https://github.com/Sighery/gonjalla
+for a Golang package based on the official API, and to help implement
+more methods.
+
+---
+
 # go-njalla-dns-scraper
 
 Go program to scrape, and offer an API for [Njalla's][0] DNS records
